@@ -1,0 +1,25 @@
+version: '3'
+
+services:
+  hello-service:
+    build: ./service
+    expose:
+      - 55056
+    restart: unless-stopped
+  envoy-proxy:
+    build: ./proxy
+    ports:
+      - 55057:55057
+      - 9901:9901
+    links:
+      - hello-service
+    depends_on:
+      - hello-service
+  hello-client:
+    build: ./client
+    ports:
+      - 55099:8000
+    depends_on:
+      - envoy-proxy
+    links:
+      - envoy-proxy
